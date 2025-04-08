@@ -1,0 +1,48 @@
+------------------ installing libraries ----------------------------
+install:
+npm install express express-session body-parser dotenv node-telegram-bot-api
+
+npm install express express-session body-parser dotenv node-telegram-bot-api pg
+
+run:
+node server.js
+
+---------commands to create database-----------
+
+Install Homebrew (if you don’t have it):
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+Install PostgreSQL:
+brew install postgresql
+
+Start PostgreSQL as a Service:
+brew services start postgresql
+
+Create a New Database:
+createdb mydatabase
+
+Connect to Your Database:
+psql mydatabase/Users/suryagunde/Downloads/sip/untitled folder/commands.txt
+/Users/suryagunde/Downloads/sip/untitled folder/public
+/Users/suryagunde/Downloads/sip/untitled folder/server.js
+
+Create the Users Table:
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  phoneNumber VARCHAR(12) UNIQUE NOT NULL,
+  chatId BIGINT UNIQUE NOT NULL
+);
+
+Exit psql:
+\q
+
+clear database:
+TRUNCATE TABLE users RESTART IDENTITY;
+
+check db:
+psql mydatabase
+SELECT * FROM users;
+
+
+-------------------------------- end ----------
