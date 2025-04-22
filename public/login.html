@@ -5,115 +5,416 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login via Telegram</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <style>
+    :root {
+      --primary: #0088cc;
+      --primary-light: #0099e6;
+      --primary-dark: #006699;
+      --secondary: #f5f5f5;
+      --success: #25D366;
+      --text-dark: #333333;
+      --text-light: #888888;
+      --border-radius: 12px;
+      --shadow: 0 10px 30px rgba(0, 136, 204, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
     body {
-      background: #f0f4f8;
-      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      background-image: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
     }
+    
     .login-container {
-      margin-top: 120px;
+      padding: 40px 0;
     }
+    
     .login-form {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
       padding: 40px;
-      background: #ffffff;
-      border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
     }
+    
+    .login-form:hover {
+      box-shadow: 0 15px 35px rgba(0, 136, 204, 0.15);
+    }
+    
     .login-form h3 {
-      color: #4a90e2;
-      font-weight: bold;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 30px;
+      position: relative;
+      display: inline-block;
     }
+    
+    .login-form h3:after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -8px;
+      height: 3px;
+      width: 50px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    .telegram-icon {
+      color: var(--primary);
+      margin-right: 10px;
+      font-size: 1.2em;
+    }
+    
     .form-control {
-      border-radius: 10px;
-      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
       background-color: #f9fbfd;
-      color: #333;
+      color: var(--text-dark);
+      padding: 12px 15px;
+      transition: var(--transition);
+      font-size: 1rem;
+      height: auto;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
     }
+    
     .form-control:focus {
-      border-color: #4a90e2;
-      box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.15);
+      background-color: #ffffff;
     }
+    
+    .form-group label {
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .btn {
+      border-radius: 8px;
+      font-weight: 500;
+      padding: 12px 24px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      text-transform: none;
+      letter-spacing: 0.5px;
+    }
+    
     .btn-primary {
-      background-color: #4a90e2;
-      border-color: #4a90e2;
-      border-radius: 10px;
+      background-color: var(--primary);
+      border-color: var(--primary);
     }
+    
     .btn-primary:hover {
-      background-color: #357abd;
+      background-color: var(--primary-light);
+      border-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 136, 204, 0.2);
     }
+    
     .btn-success {
-      background-color: #28a745;
-      border-color: #28a745;
-      border-radius: 10px;
+      background-color: var(--success);
+      border-color: var(--success);
     }
+    
     .btn-success:hover {
-      background-color: #218838;
+      background-color: #20bd5a;
+      border-color: #20bd5a;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
     }
+    
     .otp-group {
       display: none;
+      animation: fadeInUp 0.5s;
     }
+    
     #signup-text {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 25px;
       cursor: pointer;
-      color: #4a90e2;
-      font-weight: bold;
+      color: var(--primary);
+      font-weight: 500;
+      transition: var(--transition);
     }
+    
+    #signup-text:hover {
+      color: var(--primary-dark);
+    }
+    
     #otpSentMessage {
-      margin-top: 10px;
+      margin-top: 15px;
       font-size: 14px;
-      color: #777;
+      color: var(--text-light);
+      background-color: rgba(0, 136, 204, 0.08);
+      padding: 10px 15px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
     }
+    
+    #otpSentMessage i {
+      margin-right: 8px;
+      color: var(--primary);
+    }
+    
     #timer {
       font-size: 14px;
-      color: #888;
+      color: var(--text-light);
+      text-align: center;
+      margin-top: 15px;
     }
+    
     #resendOtpBtn {
       display: none;
       margin-top: 10px;
       background: transparent;
       border: none;
-      color: #4a90e2;
+      color: var(--primary);
       cursor: pointer;
+      font-weight: 500;
+      padding: 0;
+      text-decoration: none;
     }
+    
     #resendOtpBtn:hover {
+      color: var(--primary-dark);
       text-decoration: underline;
     }
+    
     .message {
       font-size: 14px;
-      color: #555;
-      margin-top: 10px;
+      color: var(--text-dark);
+      margin-top: 15px;
       text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+    
+    .message.success {
+      background-color: rgba(37, 211, 102, 0.1);
+      color: #1a9e4b;
+    }
+    
+    .message.error {
+      background-color: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+    }
+    
+    .form-wrapper {
+      position: relative;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(0, 136, 204, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 136, 204, 0);
+      }
+    }
+    
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: 15px;
+      color: var(--text-light);
+    }
+    
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    /* OTP Input Styling */
+    .otp-input-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+    
+    .otp-digit {
+      width: 50px;
+      height: 60px;
+      text-align: center;
+      font-size: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      background-color: #f9fbfd;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+      transition: var(--transition);
+    }
+    
+    .otp-digit:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.15);
+      background-color: #ffffff;
+    }
+    
+    /* Animation Classes */
+    .animate__faster {
+      animation-duration: 0.5s;
+    }
+    
+    .slide-up {
+      animation: slideUp 0.5s forwards;
+    }
+    
+    .slide-down {
+      animation: slideDown 0.5s forwards;
+    }
+    
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideDown {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Phone input styling */
+    .phone-input-container {
+      position: relative;
+    }
+    
+    .country-code {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dark);
+      font-weight: 500;
+    }
+    
+    .phone-input {
+      padding-left: 55px !important;
+    }
+    
+    /* Button ripple effect */
+    .btn {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:after {
+      content: '';
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+      background-repeat: no-repeat;
+      background-position: 50%;
+      transform: scale(10, 10);
+      opacity: 0;
+      transition: transform .5s, opacity 1s;
+    }
+    
+    .btn:active:after {
+      transform: scale(0, 0);
+      opacity: .3;
+      transition: 0s;
+    }
+    
+    /* Icon for OTP input */
+    .input-icon-container {
+      position: relative;
+    }
+    
+    .input-icon-left {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+    }
+    
+    .input-with-icon-left {
+      padding-left: 40px !important;
     }
   </style>
 </head>
 <body>
   <div class="container login-container">
     <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="login-form">
-          <h3 class="text-center">Login via Telegram</h3>
-          <form id="loginForm">
+      <div class="col-md-5">
+        <div class="login-form animate__animated animate__fadeIn">
+          <h3 class="text-center"><i class="fab fa-telegram-plane telegram-icon"></i>Login via Telegram</h3>
+          <form id="loginForm" class="slide-up">
             <div class="form-group" id="phoneNumberGroup">
-              <label for="phoneNumber" class="text-muted">Phone Number</label>
-              <input type="text" class="form-control" id="phoneNumber" placeholder="Enter your phone number" required maxlength="12">
+              <label for="phoneNumber">Phone Number</label>
+              <div class="phone-input-container">
+                <span class="country-code">+</span>
+                <input type="text" class="form-control phone-input" id="phoneNumber" placeholder="Enter your phone number" required maxlength="12">
+                <span class="input-icon"><i class="fas fa-mobile-alt"></i></span>
+              </div>
             </div>
-            <button type="button" id="getOtpBtn" class="btn btn-primary btn-block">Get OTP</button>
-            <div id="otpSentMessage" style="display:none;"></div>
-            <div class="form-group otp-group" id="otpGroup">
-              <label for="otp" class="text-muted"></label>
-              <input type="text" class="form-control" id="otp" placeholder="Enter the OTP" required maxlength="6">
+            <button type="button" id="getOtpBtn" class="btn btn-primary btn-block animate__animated">
+              <span>Get Verification Code</span>
+            </button>
+            
+            <div id="otpSentMessage" class="animate__animated animate__fadeIn" style="display:none;">
+              <i class="fas fa-check-circle"></i>
+              <span>Verification code sent</span>
             </div>
-            <button type="submit" class="btn btn-success btn-block" id="signinBtn" style="display: none;">Sign In</button>
-            <div id="timer"></div>
-            <button type="button" class="btn btn-link btn-block" id="resendOtpBtn">Resend OTP</button>
+            
+            <div class="form-group otp-group animate__animated" id="otpGroup">
+              <label for="otp">Enter 6-digit verification code</label>
+              <div class="input-icon-container">
+                <i class="fas fa-lock input-icon-left"></i>
+                <input type="text" class="form-control input-with-icon-left" id="otp" placeholder="Enter verification code" required maxlength="6">
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-success btn-block animate__animated" id="signinBtn" style="display: none;">
+              <i class="fas fa-sign-in-alt mr-2"></i>Verify & Sign In
+            </button>
+            
+            <div id="timer" class="animate__animated animate__fadeIn"></div>
+            <button type="button" class="btn btn-link btn-block" id="resendOtpBtn">Resend verification code</button>
           </form>
-          <p id="signup-text">New user? Signup via Telegram bot</p>
-          <div id="message" class="message"></div>
+          
+          <p id="signup-text" class="animate__animated animate__fadeIn">
+            <i class="fas fa-user-plus mr-1"></i>New user? Sign up via Telegram bot
+          </p>
+          
+          <div id="message" class="message animate__animated"></div>
         </div>
       </div>
     </div>
   </div>
+  
   <script>
     const getOtpBtn = document.getElementById('getOtpBtn');
     const signinBtn = document.getElementById('signinBtn');
@@ -129,18 +430,59 @@
     let otpRequestTime = null;
     let otpTimeout = null;
 
-    // Allow only digits and restrict length for phone number (max 12 digits)
+    // Add animation classes
+    function addAnimationClass(element, animationClass) {
+      element.classList.add('animate__animated', animationClass);
+      element.addEventListener('animationend', () => {
+        element.classList.remove('animate__animated', animationClass);
+      });
+    }
+
+    // Button ripple effect
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const ripple = document.createElement('span');
+        ripple.style.cssText = `
+          position: absolute;
+          background-color: rgba(255, 255, 255, 0.7);
+          border-radius: 50%;
+          width: 5px;
+          height: 5px;
+          top: ${y}px;
+          left: ${x}px;
+          transform: scale(0);
+          animation: ripple 0.6s linear;
+        `;
+        
+        button.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+
     phoneInput.addEventListener("input", function() {
       this.value = this.value.replace(/[^0-9]/g, '').slice(0, 12);
+      if (this.value.length > 0) {
+        addAnimationClass(getOtpBtn, 'animate__pulse');
+      }
     });
 
-    // Allow only digits and restrict length for OTP (max 6 digits)
     otpInput.addEventListener("input", function() {
       this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+      if (this.value.length === 6) {
+        addAnimationClass(signinBtn, 'animate__pulse');
+      }
     });
 
-    // Click event for signup text
     signupText.addEventListener("click", () => {
+      addAnimationClass(signupText, 'animate__pulse');
       const isMobile = /Android|iPhone/i.test(navigator.userAgent);
       const url = isMobile 
           ? "https://telegram.openinapp.co/tkke1" 
@@ -148,12 +490,12 @@
       window.open(url, '_blank');
     });
 
-    // Start the countdown timer
     function startTimer() {
-      let remainingTime = 120; // 2 minutes in seconds
+      let remainingTime = 120;
       otpRequestTime = Date.now();
       resendOtpBtn.style.display = 'none';
       timerDiv.style.display = 'block';
+      addAnimationClass(timerDiv, 'animate__fadeIn');
 
       otpTimeout = setInterval(function() {
         const elapsedTime = Math.floor((Date.now() - otpRequestTime) / 1000);
@@ -162,22 +504,35 @@
         if (remainingTime <= 0) {
           clearInterval(otpTimeout);
           timerDiv.style.display = 'none';
-          resendOtpBtn.style.display = 'inline-block'; // Show the "Resend OTP" button
+          resendOtpBtn.style.display = 'block';
+          addAnimationClass(resendOtpBtn, 'animate__fadeIn');
         } else {
           const minutes = Math.floor(remainingTime / 60);
           const seconds = remainingTime % 60;
-          timerDiv.innerText = `You can request a new OTP in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+          timerDiv.innerText = `You can request a new code in ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+          
+          // Add pulse animation when timer is about to finish
+          if (remainingTime <= 10) {
+            timerDiv.style.color = '#dc3545';
+          }
         }
       }, 1000);
     }
 
-    // Handle OTP request
     getOtpBtn.addEventListener('click', function() {
       const phoneNumber = phoneInput.value.trim();
       if (!phoneNumber) {
-        alert("Please enter your phone number.");
+        messageDiv.innerText = "Please enter your phone number";
+        messageDiv.className = "message error animate__animated animate__shakeX";
         return;
       }
+      
+      addAnimationClass(getOtpBtn, 'animate__fadeOut');
+      
+      // Simulate loading state
+      getOtpBtn.innerHTML = '<span><i class="fas fa-spinner fa-spin mr-2"></i>Sending...</span>';
+      getOtpBtn.disabled = true;
+      
       fetch('/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -185,32 +540,70 @@
       })
       .then(response => response.json())
       .then(data => {
-        messageDiv.innerText = data.message;
         if (data.success) {
-          // Show OTP field and sign-in button when OTP is sent successfully.
+          messageDiv.className = "message success animate__animated animate__fadeIn";
+          
+          // Show OTP group with animation
           otpGroup.style.display = 'block';
+          addAnimationClass(otpGroup, 'animate__fadeInUp');
+          
+          // Show sign in button with animation
           signinBtn.style.display = 'block';
-
-          // Hide phone number field and Get OTP button
-          document.getElementById('phoneNumberGroup').style.display = 'none';
+          addAnimationClass(signinBtn, 'animate__fadeInUp');
+          
+          // Hide phone input with animation
+          addAnimationClass(document.getElementById('phoneNumberGroup'), 'animate__fadeOutUp');
+          setTimeout(() => {
+            document.getElementById('phoneNumberGroup').style.display = 'none';
+          }, 500);
+          
+          // Hide get OTP button
           getOtpBtn.style.display = 'none';
-
-          // Display OTP sent message
-          otpSentMessageDiv.style.display = 'block';
-          otpSentMessageDiv.innerText = `OTP sent to ${phoneNumber}`;
-
-          // Hide the signup text when OTP field is visible
-          signupText.style.display = 'none';
-
-          // Start the 2-minute timer for resend OTP
+          
+          // Show OTP sent message with animation
+          otpSentMessageDiv.style.display = 'flex';
+          otpSentMessageDiv.innerHTML = `<i class="fas fa-check-circle"></i><span>Verification code sent to +${phoneNumber}</span>`;
+          addAnimationClass(otpSentMessageDiv, 'animate__fadeIn');
+          
+          // Animate the signup text out
+          addAnimationClass(signupText, 'animate__fadeOut');
+          setTimeout(() => {
+            signupText.style.display = 'none';
+          }, 500);
+          
           startTimer();
+        } else {
+          // Reset button state
+          getOtpBtn.innerHTML = '<span>Get Verification Code</span>';
+          getOtpBtn.disabled = false;
+          addAnimationClass(getOtpBtn, 'animate__fadeIn');
+          
+          // Show error message
+          messageDiv.innerText = data.message || "Failed to send verification code. Please try again.";
+          messageDiv.className = "message error animate__animated animate__shakeX";
         }
+      })
+      .catch(error => {
+        // Reset button state on error
+        getOtpBtn.innerHTML = '<span>Get Verification Code</span>';
+        getOtpBtn.disabled = false;
+        addAnimationClass(getOtpBtn, 'animate__fadeIn');
+        
+        messageDiv.innerText = "Network error. Please try again.";
+        messageDiv.className = "message error animate__animated animate__shakeX";
       });
     });
 
-    // Handle Resend OTP button click
     resendOtpBtn.addEventListener('click', function() {
       const phoneNumber = phoneInput.value.trim();
+      
+      // Add animation to the button
+      addAnimationClass(resendOtpBtn, 'animate__pulse');
+      
+      // Change button state
+      resendOtpBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Resending...';
+      resendOtpBtn.disabled = true;
+      
       fetch('/request-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,11 +611,26 @@
       })
       .then(response => response.json())
       .then(data => {
-        messageDiv.innerText = data.message;
+        // Reset button state
+        resendOtpBtn.innerHTML = 'Resend verification code';
+        resendOtpBtn.disabled = false;
+        
         if (data.success) {
-          // Reset the timer and show the OTP request process again.
+          messageDiv.innerText = "Verification code resent successfully";
+          messageDiv.className = "message success animate__animated animate__fadeIn";
           startTimer();
+        } else {
+          messageDiv.innerText = data.message || "Failed to resend verification code";
+          messageDiv.className = "message error animate__animated animate__shakeX";
         }
+      })
+      .catch(error => {
+        // Reset button state on error
+        resendOtpBtn.innerHTML = 'Resend verification code';
+        resendOtpBtn.disabled = false;
+        
+        messageDiv.innerText = "Network error. Please try again.";
+        messageDiv.className = "message error animate__animated animate__shakeX";
       });
     });
 
@@ -230,6 +638,17 @@
       e.preventDefault();
       const phoneNumber = phoneInput.value.trim();
       const otp = otpInput.value.trim();
+      
+      if (!otp || otp.length !== 6) {
+        messageDiv.innerText = "Please enter a valid 6-digit verification code";
+        messageDiv.className = "message error animate__animated animate__shakeX";
+        return;
+      }
+      
+      // Change button state
+      signinBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...';
+      signinBtn.disabled = true;
+      
       fetch('/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -237,12 +656,63 @@
       })
       .then(response => response.json())
       .then(data => {
-        messageDiv.innerText = data.message;
         if (data.success) {
-          window.location.href = '/';
+          messageDiv.innerText = "Verification successful! Redirecting...";
+          messageDiv.className = "message success animate__animated animate__fadeIn";
+          
+          // Add success animation to the form
+          document.querySelector('.login-form').classList.add('animate__animated', 'animate__pulse');
+          
+          // Show success icon in button
+          signinBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Success!';
+          
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+        } else {
+          // Reset button state
+          signinBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Verify & Sign In';
+          signinBtn.disabled = false;
+          
+          messageDiv.innerText = data.message || "Invalid verification code";
+          messageDiv.className = "message error animate__animated animate__shakeX";
         }
+      })
+      .catch(error => {
+        // Reset button state on error
+        signinBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Verify & Sign In';
+        signinBtn.disabled = false;
+        
+        messageDiv.innerText = "Network error. Please try again.";
+        messageDiv.className = "message error animate__animated animate__shakeX";
       });
     });
+
+    // Add keypress event for Enter key
+    otpInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && this.value.length === 6) {
+        signinBtn.click();
+      }
+    });
+
+    // Add keypress event for Enter key on phone input
+    phoneInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && this.value.length > 0) {
+        getOtpBtn.click();
+      }
+    });
+
+    // Add CSS animation for ripple effect
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(30);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>

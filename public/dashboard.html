@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --dark: #2d3748;
+      --light: #f8f9fa;
+      --text: #334155;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f6f8fb 0%, #e9ecf4 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, #5a7af5 100%);
+      padding: 30px;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+      animation: pulse 10s infinite linear;
+    }
+    
+    @keyframes pulse {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(5%, 5%) scale(1.02); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+    
+    h1 {
+      font-weight: 700;
+      margin-bottom: 5px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .content {
+      padding: 30px;
+    }
+    
+    .card {
+      background-color: var(--light);
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transform: translateY(0);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .user-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 20px;
+      color: white;
+      font-size: 24px;
+    }
+    
+    .user-details {
+      flex: 1;
+    }
+    
+    .info-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+      background-repeat: no-repeat;
+      background-position: 50%;
+      transform: scale(10, 10);
+      opacity: 0;
+      transition: transform 0.5s, opacity 1s;
+    }
+    
+    .btn:active::after {
+      transform: scale(0, 0);
+      opacity: 0.3;
+      transition: 0s;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px rgba(67, 97, 238, 0.3);
+    }
+    
+    .btn-primary:hover {
+      background-color: #3651d4;
+      box-shadow: 0 6px 10px rgba(67, 97, 238, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+      background-color: white;
+      color: var(--danger);
+      border: 1px solid #e8e8e8;
+    }
+    
+    .btn-danger:hover {
+      background-color: var(--danger);
+      color: white;
+      box-shadow: 0 6px 10px rgba(231, 76, 60, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .notification {
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      color: white;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .notification.success {
+      background-color: var(--success);
+    }
+    
+    .notification.error {
+      background-color: var(--danger);
+    }
+    
+    .notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 600px) {
+      .buttons {
+        flex-direction: column;
+      }
+      
+      .user-info {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .user-avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to your Dashboard</h1>
+      <p class="subtitle">Manage your account and payments</p>
+    </div>
+    
+    <div class="content">
+      <div class="card animate__animated animate__fadeIn">
+        <div class="user-info">
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="user-details">
+            <div class="info-item">
+              <div class="info-label">Name</div>
+              <div class="info-value" id="user-name">Loading...</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Phone</div>
+              <div class="info-value" id="user-phone">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="buttons">
+        <button id="payment-completed-btn" class="btn btn-primary animate__animated animate__fadeInLeft">
+          <i class="fas fa-check-circle"></i>
+          Payment Completed
+        </button>
+        <button id="logout-btn" class="btn btn-danger animate__animated animate__fadeInRight">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
+      
+      <div class="notification" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <span id="notification-message"></span>
+      </div>
+    </div>
+
+  <script>
+    // Animate elements when they become visible
+    document.addEventListener('DOMContentLoaded', () => {
+      const elements = document.querySelectorAll('.animate__animated');
+      elements.forEach(element => {
+        element.style.animationDelay = '0.3s';
+        element.style.animationDuration = '0.8s';
+      });
+    });
+
+    async function fetchUserData() {
+      try {
+        const response = await fetch('/get-user-data');
+        const data = await response.json();
+        if (data.success) {
+          document.getElementById('user-name').textContent = data.name;
+          document.getElementById('user-phone').textContent = data.phone;
+          
+          // Update avatar with user's initials
+          if (data.name) {
+            const initials = data.name.split(' ')
+              .map(name => name[0])
+              .join('')
+              .toUpperCase()
+              .substring(0, 2);
+            
+            const avatarEl = document.querySelector('.user-avatar');
+            avatarEl.innerHTML = initials;
+          }
+        } else {
+          window.location.href = '/login';  // If no user data, redirect to login page
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        showNotification('Error loading user data', true);
+      }
+    }
+
+    // Handle the "Payment Completed" button click
+    document.getElementById('payment-completed-btn').addEventListener('click', async () => {
+      const button = document.getElementById('payment-completed-btn');
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      button.disabled = true;
+      
+      const name = document.getElementById('user-name').textContent;
+      const phone = document.getElementById('user-phone').textContent;
+      
+      if (name && phone) {
+        const message = `Hey👋 ${name}\nYour payment is completed successfully, your order has been successfully confirmed. Thanks for ordering, our products have been shipped. Have a nice day!`;
+        try {
+          const response = await fetch('/send-payment-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phoneNumber: phone, message: message })
+          });
+          const result = await response.json();
+          
+          if (result.success) {
+            showNotification('Payment confirmation sent successfully!');
+          } else {
+            showNotification('Error sending payment confirmation.', true);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showNotification('Error sending payment confirmation.', true);
+        } finally {
+          setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-check-circle"></i> Payment Completed';
+            button.disabled = false;
+          }, 1000);
+        }
+      }
+    });
+
+    // Handle the "Logout" button click
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const button = document.getElementById('logout-btn');
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+      button.disabled = true;
+      
+      try {
+        const response = await fetch('/logout', { method: 'POST' });
+        if (response.ok) {
+          showNotification('Logging out...');
+          setTimeout(() => {
+            window.location.href = '/login';  // Redirect to login after logout
+          }, 1000);
+        } else {
+          showNotification('Error logging out!', true);
+          button.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+          button.disabled = false;
+        }
+      } catch (error) {
+        console.error('Error logging out:', error);
+        showNotification('Error logging out!', true);
+        button.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+        button.disabled = false;
+      }
+    });
+
+    // Function to show a notification message
+    function showNotification(message, isError = false) {
+      const notification = document.getElementById('notification');
+      const messageEl = document.getElementById('notification-message');
+      
+      notification.className = 'notification';
+      notification.classList.add(isError ? 'error' : 'success');
+      
+      // Update icon based on notification type
+      const iconEl = notification.querySelector('i');
+      iconEl.className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      
+      messageEl.textContent = message;
+      
+      // Trigger animation
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+
+      // Hide the notification after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 5000);
+    }
+
+    // Fetch user data when the page loads
+    fetchUserData();
+  </script>
+
+</body>
+</html>

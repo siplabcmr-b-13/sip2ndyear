@@ -9,7 +9,6 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// PostgreSQL pool configuration from .env
 const pool = new Pool({
   host: process.env.PGHOST,
   port: process.env.PGPORT,
@@ -18,40 +17,31 @@ const pool = new Pool({
   database: process.env.PGDATABASE,
 });
 
-// Load bot token from .env file
 const botToken = process.env.BOT_API;
 if (!botToken) {
   console.error("BOT_API token not found in .env");
   process.exit(1);
 }
 
-// Set up Telegram Bot with polling
 const bot = new TelegramBot(botToken, { polling: true });
 
-// In-memory store for OTPs and active sessions (phone -> sessionID)
 let otpStore = {};
 let activeSessions = {};
 
-// In-memory rate-limit tracker for OTP requests (phoneNumber -> array of timestamps)
 const otpRequests = {}; 
 const OTP_LIMIT = 5;
-const OTP_WINDOW = 15 * 60 * 1000; // 15 minutes in milliseconds
+const OTP_WINDOW = 15 * 60 * 1000;
 
-// Middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session middleware
 app.use(session({
   secret: 'your_secret_key_here',
   resave: false,
   saveUninitialized: true
 }));
 
-// -----------------------------------------
-// Database helper functions for "users" table
-// -----------------------------------------
 async function getUserByChatId(chatId) {
   const result = await pool.query('SELECT * FROM users WHERE chatid = $1', [chatId]);
   return result.rows[0];
@@ -62,12 +52,6 @@ async function getUserByPhone(phoneNumber) {
   return result.rows[0];
 }
 
-/*
-  Modified createOrUpdateUser:
-  - If a user exists by chat id and the phone number is different, update the record.
-  - Otherwise, try to find a user by phone number and update chat id if needed,
-    or create a new record if none is found.
-*/
 async function createOrUpdateUser({ name, phoneNumber, chatId }) {
   const existingByChat = await getUserByChatId(chatId);
   if (existingByChat) {
@@ -100,11 +84,6 @@ async function createOrUpdateUser({ name, phoneNumber, chatId }) {
   }
 }
 
-// -----------------------------------------
-// Telegram Bot Handlers
-// -----------------------------------------
-
-// /start command to register user
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
   try {
@@ -131,7 +110,6 @@ bot.onText(/\/start/, async (msg) => {
   }
 });
 
-// When user shares their contact, store or update data in PostgreSQL.
 bot.on('contact', async (msg) => {
   const chatId = msg.chat.id;
   const contact = msg.contact;
@@ -149,9 +127,6 @@ bot.on('contact', async (msg) => {
   }
 });
 
-// -----------------------------------------
-// Owner Broadcast Handler
-// -----------------------------------------
 bot.on('message', async (msg) => {
   if (!process.env.OWNER_IDS) return;
   const ownerIds = process.env.OWNER_IDS.split(',').map(id => id.trim());
@@ -159,7 +134,6 @@ bot.on('message', async (msg) => {
 
   if (!ownerIds.includes(senderId)) return;
 
-  // Forwarded messages are broadcast without command filtering.
   if (msg.forward_from || msg.forward_sender_name) {
     try {
       const result = await pool.query('SELECT chatid FROM users');
@@ -173,7 +147,6 @@ bot.on('message', async (msg) => {
     return;
   }
 
-  // Process direct owner messages only if they start with "/send"
   if ((msg.text && msg.text.startsWith('/send')) || (msg.caption && msg.caption.startsWith('/send'))) {
     let broadcastText = "";
     if (msg.text && msg.text.startsWith('/send')) {
@@ -220,28 +193,20 @@ bot.on('message', async (msg) => {
   }
 });
 
-// -----------------------------------------
-// Web Routes
-// -----------------------------------------
-
-// Serve the login page
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// POST route to request an OTP with rate limiting
 app.post('/request-otp', async (req, res) => {
   const { phoneNumber } = req.body;
   if (!phoneNumber) {
     return res.json({ success: false, message: "Phone number is required" });
   }
 
-  // Rate limit check: allow only 5 OTP requests per 15 minutes.
   const now = Date.now();
   if (!otpRequests[phoneNumber]) {
     otpRequests[phoneNumber] = [];
   }
-  // Remove timestamps older than 15 minutes.
   otpRequests[phoneNumber] = otpRequests[phoneNumber].filter(timestamp => now - timestamp < OTP_WINDOW);
   if (otpRequests[phoneNumber].length >= OTP_LIMIT) {
     return res.json({ success: false, message: "OTP request limit reached. Please try again later." });
@@ -263,7 +228,6 @@ app.post('/request-otp', async (req, res) => {
   }
 });
 
-// POST route to verify OTP and sign in the user
 app.post('/verify-otp', async (req, res) => {
   const { phoneNumber, otp } = req.body;
   if (!phoneNumber || !otp) {
@@ -282,24 +246,26 @@ app.post('/verify-otp', async (req, res) => {
   activeSessions[phoneNumber] = req.session.id;
   req.session.phoneNumber = phoneNumber;
   delete otpStore[phoneNumber];
-  res.json({ success: true, message: "Successfully signed in" });
+  
+  // Redirect to the dashboard after successful login
+  res.json({ success: true, message: "Successfully signed in", redirectTo: "/dashboard" });
 });
 
-// Protected homepage with Logout button
 app.get('/', (req, res) => {
   if (!req.session.phoneNumber) {
     return res.redirect('/login');
   }
-  res.send(`
-    <h1>Welcome, ${req.session.phoneNumber}!</h1>
-    <p>You are logged in.</p>
-    <form action="/logout" method="POST">
-      <button type="submit" class="btn btn-danger">Logout</button>
-    </form>
-  `);
+  // If the user is logged in, redirect to the dashboard
+  res.redirect('/dashboard');
 });
 
-// Logout route
+app.get('/dashboard', (req, res) => {
+  if (!req.session.phoneNumber) {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
 app.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) console.error("Error destroying session:", err);
@@ -307,7 +273,49 @@ app.post('/logout', (req, res) => {
   });
 });
 
-// Start the server
+// Endpoint to get the logged-in user's data
+app.get('/get-user-data', (req, res) => {
+  if (!req.session.phoneNumber) {
+    return res.json({ success: false });
+  }
+  // Retrieve user details from the database
+  pool.query('SELECT * FROM users WHERE phonenumber = $1', [req.session.phoneNumber])
+    .then(result => {
+      if (result.rows.length > 0) {
+        const user = result.rows[0];
+        res.json({
+          success: true,
+          name: user.name,
+          phone: user.phonenumber
+        });
+      } else {
+        res.json({ success: false });
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching user data:', error);
+      res.json({ success: false });
+    });
+});
+
+// Endpoint to send payment confirmation message to the user
+app.post('/send-payment-confirmation', async (req, res) => {
+  const { phoneNumber, message } = req.body;
+
+  try {
+    const user = await getUserByPhone(phoneNumber);
+    if (user) {
+      await bot.sendMessage(user.chatid, message);
+      res.json({ success: true });
+    } else {
+      res.json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error sending payment confirmation:', error);
+    res.json({ success: false, message: 'Failed to send payment confirmation' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
