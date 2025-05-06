@@ -7,7 +7,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const { Pool } = require('pg');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 const pool = new Pool({
   host: process.env.PGHOST,
